@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Walking Barber with Scissors</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #1a1a1a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
+
+        canvas {
+            background-color: #2b2b2b;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border-radius: 12px;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="barberCanvas" width="600" height="600"></canvas>
+
+    <script>
+        const canvas = document.getElementById('barberCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const radius = 160; // Circle loop size
+
+        let angle = 0;      // Rotation angle along the circular path
+        let walkPhase = 0;  // Controls leg animation
+        let snipPhase = 0;  // Controls scissor open/close animation
+
+        function drawScissors(x, y, angleOpen) {
+            ctx.save();
+            ctx.translate(x, y);
+
+            // Scissors styling
+            ctx.strokeStyle = '#e0e0e0';
+            ctx.lineWidth = 3;
+            ctx.fillStyle = '#888';
+
+            // Top blade
+            ctx.save();
+            ctx.rotate(-angleOpen);
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(20, -3);
+            ctx.stroke();
+            // Handle loop
+            ctx.beginPath();
+            ctx.arc(-5, -2, 4, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.restore();
+
+            // Bottom blade
+            ctx.save();
+            ctx.rotate(angleOpen);
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(20, 3);
+            ctx.stroke();
+            // Handle loop
+            ctx.beginPath();
+            ctx.arc(-5, 2, 4, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.restore();
+
+            // Pivot screw
+            ctx.fillStyle = '#ff3333';
+            ctx.beginPath();
+            ctx.arc(0, 0, 2, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        function drawBarber(x, y, headingAngle) {
+            ctx.save();
+            ctx.translate(x, y);
+            // Rotate character so he faces forward along the movement path
+            ctx.rotate(headingAngle + Math.PI / 2);
+
+            // Leg animation offsets
+            const leftLegOffset = Math.sin(walkPhase) * 12;
+            const rightLegOffset = -Math.sin(walkPhase) * 12;
+
+            // --- LEGS ---
+            ctx.lineWidth = 6;
+            ctx.strokeStyle = '#2c3e50'; // Dark trousers
+
+            // Left leg
+            ctx.beginPath();
+            ctx.moveTo(-8, 10);
+            ctx.lineTo(-8 + leftLegOffset, 28);
+            ctx.stroke();
+
+            // Right leg
+            ctx.beginPath();
+            ctx.moveTo(8, 10);
+            ctx.lineTo(8 + rightLegOffset, 28);
+            ctx.stroke();
+
+            // Shoes
+            ctx.fillStyle = '#111';
+            ctx.beginPath();
+            ctx.arc(-8 + leftLegOffset, 29, 4, 0, Math.PI * 2);
+            ctx.arc(8 + rightLegOffset, 29, 4, 0, Math.PI * 2);
+            ctx.fill();
+
+            // --- BODY (Barber Apron) ---
+            ctx.fillStyle = '#e74c3c'; // Red apron / shirt
+            ctx.fillRect(-14, -15, 28, 28);
+
+            // Apron stripes (classic barber pattern)
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(-10, -15); ctx.lineTo(-10, 13);
+            ctx.moveTo(0, -15);   ctx.lineTo(0, 13);
+            ctx.moveTo(10, -15);  ctx.lineTo(10, 13);
+            ctx.stroke();
+
+            // --- HEAD & HAIR ---
+            // Head
+            ctx.fillStyle = '#f1c40f'; // Skin tone / face
+            ctx.beginPath();
+            ctx.arc(0, -25, 12, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Stylish Barber Hair & Mustache
+            ctx.fillStyle = '#3e2723';
+            ctx.beginPath();
+            ctx.arc(0, -28, 12, Math.PI, Math.PI * 2); // Hair top
+            ctx.fill();
+
+            // Mustache
+            ctx.fillRect(-6, -21, 12, 3);
+
+            // Eyes
+            ctx.fillStyle = '#000';
+            ctx.beginPath();
+            ctx.arc(4, -25, 1.5, 0, Math.PI * 2);
+            ctx.fill();
+
+            // --- ARMS & SCISSORS ---
+            const armAngle = Math.sin(walkPhase * 2) * 0.15;
+            
+            // Left arm (resting or balancing)
+            ctx.strokeStyle = '#e74c3c';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(-14, -10);
+            ctx.lineTo(-22, 2);
+            ctx.stroke();
+
+            // Right arm (holding & snipping scissors)
+            ctx.beginPath();
+            ctx.moveTo(14, -10);
+            const handX = 22 + Math.cos(armAngle) * 5;
+            const handY = -5 + Math.sin(armAngle) * 5;
+            ctx.lineTo(handX, handY);
+            ctx.stroke();
+
+            // Scissors Snipping Angle (opening and closing)
+            const scissorOpenAngle = 0.1 + Math.abs(Math.sin(snipPhase)) * 0.35;
+            drawScissors(handX + 6, handY, scissorOpenAngle);
+
+            ctx.restore();
+        }
+
+        function animate() {
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw circular walk path guideline
+            ctx.strokeStyle = '#3a3a3a';
+            ctx.lineWidth = 4;
+            ctx.setLineDash([8, 8]);
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.setLineDash([]); // Reset line dash
+
+            // Calculate barber's position on the circular path
+            const barberX = centerX + Math.cos(angle) * radius;
+            const barberY = centerY + Math.sin(angle) * radius;
+
+            // Heading direction (tangent to the circle)
+            const headingAngle = angle + Math.PI / 2;
+
+            // Draw the animated barber
+            drawBarber(barberX, barberY, headingAngle);
+
+            // Update movement variables
+            angle += 0.015;      // Speed along the circular path
+            walkPhase += 0.12;   // Leg walking animation speed
+            snipPhase += 0.2;    // Scissor snipping speed
+
+            requestAnimationFrame(animate);
+        }
+
+        // Start animation loop
+        animate();
+    </script>
+</body>
+</html>
