@@ -1,17 +1,246 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
+<head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Barber Animation</title>
-    
-    <!-- p5.js Library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.js"></script>
-    
-    <!-- Link to files inside your barbar folder -->
-    <link rel="stylesheet" type="text/css" href="barbar/style.css">
-    <script src="barbar/sketch.js"></script>
-  </head>
-  <body>
-  </body>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #1a1a1a;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            color: #ffffff;
+        }
+
+        /* Initial Blue Circle Style */
+        #startCircle {
+            width: 200px;
+            height: 200px;
+            background-color: #3498db;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 10px 25px rgba(52, 152, 219, 0.4);
+            transition: transform 0.2s ease, background-color 0.2s ease;
+            user-select: none;
+        }
+
+        #startCircle:hover {
+            transform: scale(1.05);
+            background-color: #2980b9;
+        }
+
+        #startCircle p {
+            font-size: 18px;
+            font-weight: bold;
+            pointer-events: none;
+        }
+
+        /* Canvas Hidden by Default */
+        canvas {
+            background-color: #2b2b2b;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border-radius: 12px;
+            display: none; /* Hidden until clicked */
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Step 1: Initial Blue Circle -->
+    <div id="startCircle">
+        <p>Click Me!</p>
+    </div>
+
+    <!-- Step 2: Canvas (Barber Animation) -->
+    <canvas id="barberCanvas" width="600" height="600"></canvas>
+
+    <script>
+        const startCircle = document.getElementById('startCircle');
+        const canvas = document.getElementById('barberCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const radius = 160; 
+
+        let angle = 0;      
+        let walkPhase = 0;  
+        let snipPhase = 0;  
+        let animationStarted = false;
+
+        // When the blue circle is clicked/pressed
+        startCircle.addEventListener('click', startAnimation);
+
+        function startAnimation() {
+            startCircle.style.display = 'none'; // Hide the blue circle
+            canvas.style.display = 'block';     // Show the animation canvas
+            if (!animationStarted) {
+                animationStarted = true;
+                animate();                       // Start the loop
+            }
+        }
+
+        function drawScissors(x, y, angleOpen) {
+            ctx.save();
+            ctx.translate(x, y);
+
+            ctx.strokeStyle = '#e0e0e0';
+            ctx.lineWidth = 3;
+
+            // Top blade
+            ctx.save();
+            ctx.rotate(-angleOpen);
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(20, -3);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(-5, -2, 4, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.restore();
+
+            // Bottom blade
+            ctx.save();
+            ctx.rotate(angleOpen);
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(20, 3);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(-5, 2, 4, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.restore();
+
+            // Screw
+            ctx.fillStyle = '#ff3333';
+            ctx.beginPath();
+            ctx.arc(0, 0, 2, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        function drawBarber(x, y, headingAngle) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(headingAngle + Math.PI / 2);
+
+            const leftLegOffset = Math.sin(walkPhase) * 12;
+            const rightLegOffset = -Math.sin(walkPhase) * 12;
+
+            // Legs
+            ctx.lineWidth = 6;
+            ctx.strokeStyle = '#2c3e50';
+            ctx.beginPath();
+            ctx.moveTo(-8, 10);
+            ctx.lineTo(-8 + leftLegOffset, 28);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(8, 10);
+            ctx.lineTo(8 + rightLegOffset, 28);
+            ctx.stroke();
+
+            // Shoes
+            ctx.fillStyle = '#111';
+            ctx.beginPath();
+            ctx.arc(-8 + leftLegOffset, 29, 4, 0, Math.PI * 2);
+            ctx.arc(8 + rightLegOffset, 29, 4, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Body
+            ctx.fillStyle = '#e74c3c';
+            ctx.fillRect(-14, -15, 28, 28);
+
+            // Stripe details
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(-10, -15); ctx.lineTo(-10, 13);
+            ctx.moveTo(0, -15);   ctx.lineTo(0, 13);
+            ctx.moveTo(10, -15);  ctx.lineTo(10, 13);
+            ctx.stroke();
+
+            // Head
+            ctx.fillStyle = '#f1c40f';
+            ctx.beginPath();
+            ctx.arc(0, -25, 12, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Hair & Mustache
+            ctx.fillStyle = '#3e2723';
+            ctx.beginPath();
+            ctx.arc(0, -28, 12, Math.PI, Math.PI * 2);
+            ctx.fill();
+            ctx.fillRect(-6, -21, 12, 3);
+
+            // Eye
+            ctx.fillStyle = '#000';
+            ctx.beginPath();
+            ctx.arc(4, -25, 1.5, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Arms & Scissors
+            const armAngle = Math.sin(walkPhase * 2) * 0.15;
+            ctx.strokeStyle = '#e74c3c';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(-14, -10);
+            ctx.lineTo(-22, 2);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(14, -10);
+            const handX = 22 + Math.cos(armAngle) * 5;
+            const handY = -5 + Math.sin(armAngle) * 5;
+            ctx.lineTo(handX, handY);
+            ctx.stroke();
+
+            const scissorOpenAngle = 0.1 + Math.abs(Math.sin(snipPhase)) * 0.35;
+            drawScissors(handX + 6, handY, scissorOpenAngle);
+
+            ctx.restore();
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Walk path
+            ctx.strokeStyle = '#3a3a3a';
+            ctx.lineWidth = 4;
+            ctx.setLineDash([8, 8]);
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Calculations
+            const barberX = centerX + Math.cos(angle) * radius;
+            const barberY = centerY + Math.sin(angle) * radius;
+            const headingAngle = angle + Math.PI / 2;
+
+            drawBarber(barberX, barberY, headingAngle);
+
+            angle += 0.015;
+            walkPhase += 0.12;
+            snipPhase += 0.2;
+
+            requestAnimationFrame(animate);
+        }
+    </script>
+</body>
 </html>
