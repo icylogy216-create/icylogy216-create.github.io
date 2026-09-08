@@ -8,25 +8,30 @@
 </head>
 <body>
 
-    <!-- Navigation Menu Bar -->
-    <nav class="navbar">
-        <ul class="nav-links">
-            <li><a href="index.html" class="active">Home</a></li>
-            <li><a href="#appointment">Appointment</a></li>
-        </ul>
-    </nav>
+    <!-- Navigation Bar -->
+<nav class="navbar">
+    <ul class="nav-links">
+        <li><a href="index.html" class="active">Home</a></li>
+        <li><a href="#appointment">Appointment</a></li>
+    </ul>
+</nav>
 
-    <!-- Main Content Container -->
-    <main class="content-container">
-        <!-- Existing Clickable Button -->
-        <div class="interactive-btn">
-            <p>Click Me!</p>
-        </div>
+<main class="content-container">
+    <!-- Existing Canvas Animation -->
+    <canvas id="barberCanvas" height="600" width="600"></canvas>
 
-        <!-- Existing Barber Animation Canvas -->
-        <canvas id="barberCanvas" height="600" width="600"></canvas>
-    </main>
-
+    <!-- Appointment Target Section -->
+    <section id="appointment" class="appointment-section">
+        <h2>Book Your Appointment</h2>
+        <form class="booking-form">
+            <input type="text" placeholder="Your Name" required>
+            <input type="email" placeholder="Your Email" required>
+            <input type="date" required>
+            <button type="submit">Confirm Booking</button>
+        </form>
+    </section>
+</main>
+    
     <script src="script.js"></script>
 </body>
 </html>
