@@ -1,3 +1,41 @@
+/* Enable smooth scrolling across the page */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Appointment Section Styling */
+.appointment-section {
+    width: 100%;
+    max-width: 500px;
+    padding: 40px 20px;
+    margin: 50px auto;
+    background: #1e1e1e;
+    border-radius: 8px;
+    /* Prevents fixed header from covering section title when scrolled into view */
+    scroll-margin-top: 90px; 
+}
+
+.booking-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.booking-form input, 
+.booking-form button {
+    padding: 12px;
+    border-radius: 4px;
+    border: 1px solid #333;
+}
+
+.booking-form button {
+    background-color: #e63946;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+}
+
 /* Reset basic margins */
 * {
     margin: 0;
