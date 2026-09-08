@@ -1,7 +1,64 @@
-html, body {
-  margin: 0;
-  padding: 0;
+/* Reset basic margins */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #121212; /* Dark theme suitable for a barbershop */
+    color: #ffffff;
+}
+
+/* Navigation Bar Styling */
+.navbar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background-color: #1a1a1a;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.nav-links {
+    display: flex;
+    justify-content: center;
+    list-style: none;
+    padding: 15px 0;
+}
+
+.nav-links li {
+    margin: 0 25px;
+}
+
+.nav-links a {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 1.1rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: color 0.3s ease;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+    color: #e63946; /* Accent barber color */
+}
+
+/* Layout adjusting for navbar height */
+.content-container {
+    padding-top: 80px; /* Prevents navbar from covering canvas */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+/* Existing Canvas Styling */
 canvas {
-  display: block;
+    display: block;
+    margin: 20px auto;
 }
